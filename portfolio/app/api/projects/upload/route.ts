@@ -61,10 +61,9 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ ok: true, id: docRef.id });
-  } catch (e: any) {
-    return NextResponse.json(
-      { error: e?.message || "Upload failed" },
-      { status: 401 }
-    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Upload failed";
+    return NextResponse.json({ error: message }, { status: 401 });
   }
 }
+

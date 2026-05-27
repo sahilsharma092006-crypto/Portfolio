@@ -1,22 +1,11 @@
-# TODO — SAHIL SHARMA Portfolio (cinematic + animated projects modal)
+# TODO — portfolio completion
 
-- [x] Update `app/layout.tsx` metadata/title/description
-- [x] Update `app/components/Hero.tsx` hero heading + description + CTAs + availability
+- [x] Inspect and fix homepage composition (`app/page.tsx`) to include full sections: Home, Projects, Skills, Contact.
 
-
-- [x] Replace placeholder sections in `app/page.tsx` with:
-  - [x] Animated Projects grid (scroll reveal + stagger)
-  - [x] Skills section (use skills from provided profile)
-  - [x] Contact section (email + phone + location)
-
-- [x] Add `app/components/ProjectModal.tsx` (Framer Motion open/close, ESC close)
-
-- [x] Wire project cards to open the modal (click + keyboard)
-
-- [x] Add reduced-motion support for animations
-
-- [x] Verify TypeScript + lint, run `npm run dev`
-- [x] Use user media assets (videos) for project thumbs/hero (v1.mp4, v2.mp4)
-
-
+- [ ] Wire `ProjectsGrid` + `ProjectModal` state in `app/page.tsx` (open/close, ESC, click).
+- [ ] Ensure section IDs match nav: #home, #projects, #skills, #contact.
+- [ ] Ensure Hero/intro doesn’t conflict with fixed navbar spacing.
+- [ ] Validate Admin pages compile (scan `app/components/admin/*` and related API routes).
+- [ ] Fix any broken code discovered in `app/api/projects/upload/route.ts`.
+- [ ] Run `npm run lint` and `npm run build` to confirm no TS/runtime errors.
 

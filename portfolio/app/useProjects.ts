@@ -15,8 +15,9 @@ export interface Project {
     thumb?: string;
     hero?: string;
   };
-  createdAt: any; // This will be a Firebase Timestamp object
+  createdAt: unknown; // Firebase Timestamp (avoid explicit any)
 }
+
 
 export function useProjects() {
   const [projects, setProjects] = useState<Project[]>([]);

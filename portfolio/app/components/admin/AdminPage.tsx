@@ -10,7 +10,7 @@ import {
 } from "firebase/storage";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
-type ProjectImages = { thumb?: string; hero?: string };
+
 
 type UploadForm = {
   name: string;
@@ -22,9 +22,12 @@ type UploadForm = {
   heroFile: File | null;
 };
 
+
 export default function AdminPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("Sign in to upload projects.");
+
+
 
   const [form, setForm] = useState<UploadForm>({
     name: "",
@@ -62,10 +65,12 @@ export default function AdminPage() {
         return;
       }
 
-      const idToken = await user.getIdToken();
+      // idToken could be used for server-authorized uploads.
+      // Current flow writes metadata directly to Firestore.
 
       let thumbUrl: string | undefined;
       let heroUrl: string | undefined;
+
 
       const uidPrefix = `projects/${Date.now()}`;
 
@@ -110,12 +115,14 @@ export default function AdminPage() {
         thumbFile: null,
         heroFile: null,
       });
-    } catch (e: any) {
-      setStatus(e?.message || "Upload failed");
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Upload failed";
+      setStatus(message);
     } finally {
       setUploading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-black text-white pt-24 pb-16">
