@@ -14,6 +14,11 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
+// Safety check: Ensure essential config is present
+if (!firebaseConfig.apiKey && typeof window !== 'undefined') {
+  console.warn("Firebase configuration is missing. Check your environment variables.");
+}
+
 // Initialize Firebase
 // Singleton pattern: reuse existing app if it exists (useful for HMR)
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
@@ -29,7 +34,7 @@ const storage = getStorage(app);
 
 // Connect to emulators if running locally in development mode
 const isBrowser = typeof window !== 'undefined';
-const isDev = process.env.NODE_ENV !== 'production';
+const isDev = process.env.NODE_ENV === 'development';
 
 // Only connect to emulators in the browser and in development mode
 if (isBrowser && isDev) {
@@ -40,7 +45,7 @@ if (isBrowser && isDev) {
 
 // Initialize Analytics (only runs in browser environments)
 let analytics = null;
-if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+if (isBrowser && process.env.NODE_ENV === 'production') {
   analytics = getAnalytics(app);
 }
 

@@ -1,5 +1,20 @@
 {
+  "name": "sahil-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
   "dependencies": {
-    "firebase": "^12.13.0"
+    "firebase": "^10.13.0",
+    "next": "14.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "framer-motion": "^11.2.10",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.3.0"
   }
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Poppins, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/Navbar";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -32,9 +33,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${poppins.variable} ${mono.variable} h-full antialiased`}
+      className={`${inter.variable} ${poppins.variable} ${mono.variable} h-full antialiased selection:bg-blue-500 selection:text-white scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col overflow-x-hidden bg-black text-white font-inter">
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }

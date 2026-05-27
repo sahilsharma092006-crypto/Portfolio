@@ -1,34 +1,14 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { getAuth } from "firebase/auth";
-import { initializeApp, getApps } from "firebase/app";
+import { auth, storage, db } from "@/firebase";
 import {
   getDownloadURL,
-  getStorage,
   ref,
   uploadBytes,
 } from "firebase/storage";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
-
-// Admin page is protected by our server route (requires allowed admin email).
-// But we still require the user to be signed in.
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
-
-function ensureFirebase() {
-  if (!getApps().length) {
-    initializeApp(firebaseConfig as any);
-  }
-}
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 type ProjectImages = { thumb?: string; hero?: string };
 
@@ -43,9 +23,6 @@ type UploadForm = {
 };
 
 export default function AdminPage() {
-  ensureFirebase();
-
-  const [authReady, setAuthReady] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("Sign in to upload projects.");
 
@@ -61,24 +38,11 @@ export default function AdminPage() {
 
   const [uploading, setUploading] = useState(false);
 
-  const app = useMemo(() => {
-    try {
-      const { getApp } = require("firebase/app");
-      return getApp();
-    } catch {
-      return null;
-    }
-  }, []);
-
   useEffect(() => {
-    // Lazy check auth state.
-    const auth = getAuth();
-    setAuthReady(true);
-    const u = auth.currentUser;
-    setUserEmail(u?.email ?? null);
-
-    // If you want a full sign-in UI, we can add it.
-    // For now: user should sign in using Firebase Auth elsewhere or we add Google UI.
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUserEmail(user?.email ?? null);
+    });
+    return () => unsubscribe();
   }, []);
 
   const onPick = (key: "thumbFile" | "heroFile") =>
@@ -92,7 +56,6 @@ export default function AdminPage() {
       setUploading(true);
       setStatus("Uploading to Firebase Storage...");
 
-      const auth = getAuth();
       const user = auth.currentUser;
       if (!user) {
         setStatus("Not signed in.");
@@ -100,8 +63,6 @@ export default function AdminPage() {
       }
 
       const idToken = await user.getIdToken();
-
-      const storage = getStorage();
 
       let thumbUrl: string | undefined;
       let heroUrl: string | undefined;
@@ -122,33 +83,22 @@ export default function AdminPage() {
 
       setStatus("Saving metadata to Firestore...");
 
-      // Write metadata via our protected route.
-      const res = await fetch("/api/projects/upload", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${idToken}`,
+      // Write directly to Firestore (Compatible with Static Export)
+      await addDoc(collection(db, "projects"), {
+        name: form.name,
+        category: form.category,
+        year: form.year,
+        description: form.description,
+        tags: form.tags
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        images: {
+          thumb: thumbUrl,
+          hero: heroUrl,
         },
-        body: JSON.stringify({
-          name: form.name,
-          category: form.category,
-          year: form.year,
-          description: form.description,
-          tags: form.tags
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean),
-          images: {
-            thumb: thumbUrl,
-            hero: heroUrl,
-          },
-        }),
+        createdAt: serverTimestamp()
       });
-
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({}));
-        throw new Error(j?.error || "Failed to save");
-      }
 
       setStatus("Uploaded successfully ✅");
       setForm({
@@ -279,4 +229,3 @@ export default function AdminPage() {
     </div>
   );
 }
-

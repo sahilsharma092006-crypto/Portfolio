@@ -1,17 +1,112 @@
-rules_version='2'
-
+rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow public read access to your portfolio projects
-    match /projects/{projectId} {
-      allow read: if true;
-      allow write: if false; // Only update via Firebase Console or Admin
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: projects
+    // Fields:
+    //   - name: string (required, 1-100 chars)
+    //   - category: string (required, 1-50 chars)
+    //   - year: string or int (required)
+    //   - description: string (required, 1-5000 chars)
+    //   - tags: list of strings (optional, max 20 tags)
+    //   - images: map { thumb: string, hero: string } (optional)
+    //   - createdAt: timestamp (required, immutable)
+    //
+    // Collection: admins
+    // Document ID: verified email address (lowercase)
+    // Fields: none (existence signifies admin status)
+    //
+    // ===============================================================
+
+    // Default deny: All access is blocked unless explicitly allowed
+    match /{document=**} {
+      allow read, write: if false;
     }
-    
-    // Allow visitors to submit contact messages, but not read them
-    match /messages/{messageId} {
-      allow create: if true;
-      allow read, update, delete: if false;
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      // Check if a document exists in the 'admins' collection with the user's email as ID.
+      // Requires the email to be verified to prevent spoofing.
+      return isAuthenticated() && 
+             request.auth.token.email_verified == true &&
+             exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function validString(field, min, max) {
+      return request.resource.data[field] is string &&
+             request.resource.data[field].size() >= min &&
+             request.resource.data[field].size() <= max;
+    }
+
+    function isValidImageUrl(url) {
+      return url is string &&
+             (url.matches("^https://.*") || url.matches("^http://.*")) &&
+             url.size() < 1000;
+    }
+
+    function isValidYear(val) {
+      return val is string || val is int;
+    }
+
+    function isRecent(time) {
+      return time is timestamp &&
+             time > request.time - duration.value(5, 'm') &&
+             time <= request.time;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidProject() {
+      let data = request.resource.data;
+      let hasImages = 'images' in data;
+      
+      return hasRequiredFields(['name', 'category', 'year', 'description', 'createdAt']) &&
+             hasOnlyAllowedFields(['name', 'category', 'year', 'description', 'tags', 'images', 'createdAt']) &&
+             validString('name', 1, 100) &&
+             validString('category', 1, 50) &&
+             isValidYear(data.year) &&
+             validString('description', 1, 5000) &&
+             (!('tags' in data) || (data.tags is list && data.tags.size() <= 20)) &&
+             (!hasImages || (data.images is map && 
+                             data.images.keys().hasOnly(['thumb', 'hero']) &&
+                             (!('thumb' in data.images) || isValidImageUrl(data.images.thumb)) &&
+                             (!('hero' in data.images) || isValidImageUrl(data.images.hero)))) &&
+             (request.method == 'create' ? isRecent(data.createdAt) : data.createdAt == resource.data.createdAt);
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    match /projects/{project} {
+      // Public read access for portfolio visibility
+      allow read: if true;
+      
+      // Strict write access with data validation
+      allow create: if isAdmin() && isValidProject();
+      allow update: if isAdmin() && isValidProject();
+      allow delete: if isAdmin();
     }
   }
 }

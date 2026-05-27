@@ -15,17 +15,16 @@ async function requireAdmin(req: NextRequest) {
   const admin = await getAdmin();
   const auth = admin.auth();
   const decoded = await auth.verifyIdToken(token);
+  const db = admin.firestore();
 
-  const allowed = (process.env.ADMIN_EMAILS || "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-
-  if (!allowed.length) {
-    throw new Error("ADMIN_EMAILS env var not configured");
+  // Check the 'admins' collection for a document matching the email.
+  // This aligns with the firestore.rules for a single source of truth.
+  if (!decoded.email || !decoded.email_verified) {
+    throw new Error("Forbidden: Verified email required");
   }
 
-  if (!decoded.email || !allowed.includes(decoded.email)) {
+  const adminDoc = await db.collection("admins").doc(decoded.email).get();
+  if (!adminDoc.exists) {
     throw new Error("Forbidden");
   }
 
@@ -69,4 +68,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
