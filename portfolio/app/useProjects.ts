@@ -15,7 +15,7 @@ export interface Project {
     thumb?: string;
     hero?: string;
   };
-  createdAt: any;
+  createdAt: any; // This will be a Firebase Timestamp object
 }
 
 export function useProjects() {
@@ -23,7 +23,6 @@ export function useProjects() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Create a query to get projects ordered by creation time
     const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
