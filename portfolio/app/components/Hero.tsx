@@ -16,8 +16,10 @@ export default function Hero() {
 
   // Slight parallax X to feel like a camera move
   const x = useTransform(scrollY, [0, 900], [0, -18]);
+  const fogY = useTransform(scrollY, [0, 900], [0, 120]);
 
   // Depth blur: far layers blur more.
+
   // (Optional) blur values if your Framer Motion types support transform -> filter.
   // Kept simple here for compatibility.
   // NOTE: keeping blur transforms optional (no-op in this version for TS compatibility)
@@ -84,11 +86,12 @@ export default function Hero() {
             alt="Fog"
             className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-screen"
             style={{
-              y: useTransform(scrollY, [0, 900], [0, 120]),
+              y: fogY,
               filter: "blur(6px) contrast(1.05)",
               transform: "translateZ(10px) scale(1.08)",
             }}
           />
+
 
           {/* Light leaks */}
           <div className="pointer-events-none absolute inset-0 opacity-50 [background:linear-gradient(90deg,rgba(59,130,246,0.25),transparent_45%),linear-gradient(180deg,rgba(16,185,129,0.12),transparent_60%),radial-gradient(circle_at_25%_30%,rgba(56,189,248,0.25),transparent_45%)]" />
