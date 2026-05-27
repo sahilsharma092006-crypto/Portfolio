@@ -3,12 +3,10 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { useProjects, Project } from '../useProjects';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+// Note: keep this component dependency-free (no clsx/tailwind-merge) so Next.js builds
+// even if those packages aren't installed.
+
 
 export default function CinematicPortfolio() {
   const { projects, loading } = useProjects();
