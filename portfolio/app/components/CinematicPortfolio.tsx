@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { useProjects, Project } from '../useProjects';
+import Image from 'next/image';
 
 // Note: keep this component dependency-free (no clsx/tailwind-merge) so Next.js builds
 // even if those packages aren't installed.
@@ -28,14 +29,14 @@ export default function CinematicPortfolio() {
 
   return (
     <main ref={containerRef} className="bg-black">
-      {projects.map((project, index) => (
-        <ProjectSection key={project.id} project={project} index={index} />
+      {projects.map((project) => (
+        <ProjectSection key={project.id} project={project} />
       ))}
     </main>
   );
 }
 
-function ProjectSection({ project, index }: { project: Project; index: number }) {
+function ProjectSection({ project }: { project: Project }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   
   // Mouse Tracking for Tilt Effect
@@ -82,10 +83,11 @@ function ProjectSection({ project, index }: { project: Project; index: number })
       >
         <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black z-10" />
         {project.images.hero && (
-          <img 
+          <Image 
             src={project.images.hero} 
             alt="" 
-            className="h-full w-full object-cover grayscale opacity-30 scale-110"
+            fill
+            className="object-cover grayscale opacity-30 scale-110"
           />
         )}
       </motion.div>
@@ -103,10 +105,11 @@ function ProjectSection({ project, index }: { project: Project; index: number })
       >
         <div className="absolute inset-0 z-0">
           {project.images.thumb && (
-            <img 
+            <Image 
               src={project.images.thumb} 
               alt={project.name}
-              className="h-full w-full object-cover transition-transform duration-700"
+              fill
+              className="object-cover transition-transform duration-700"
             />
           )}
           <div className="absolute inset-0 bg-black/40" />

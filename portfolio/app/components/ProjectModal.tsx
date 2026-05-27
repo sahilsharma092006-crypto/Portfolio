@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 
 export type Project = {
   id: string;
@@ -79,11 +80,14 @@ export default function ProjectModal({
                     playsInline
                   />
                 ) : (
-                  <img
-                    src={project.images.hero}
-                    alt="Project preview"
-                    className="h-64 w-full object-cover opacity-90"
-                  />
+                  <div className="relative h-64 w-full">
+                    <Image
+                      src={project.images.hero}
+                      alt="Project preview"
+                      fill
+                      className="object-cover opacity-90"
+                    />
+                  </div>
                 )
               ) : (
                 <div className="h-64 w-full bg-gradient-to-br from-blue-500/20 to-emerald-500/10" />

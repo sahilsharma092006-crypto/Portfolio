@@ -3,6 +3,7 @@
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Project } from "./ProjectModal";
+import Image from "next/image";
 
 export default function ProjectsGrid({
   projects,
@@ -90,12 +91,14 @@ export default function ProjectsGrid({
                     playsInline
                   />
                 ) : (
-                  <img
-                    src={p.images.thumb}
-                    alt={`${p.name} thumbnail`}
-                    className="h-32 w-full object-cover opacity-25 transition-opacity duration-300 group-hover:opacity-35"
-                    loading="lazy"
-                  />
+                  <div className="relative h-32 w-full">
+                    <Image
+                      src={p.images.thumb}
+                      alt={`${p.name} thumbnail`}
+                      fill
+                      className="object-cover opacity-25 transition-opacity duration-300 group-hover:opacity-35"
+                    />
+                  </div>
                 )
               ) : (
 

@@ -4,6 +4,35 @@ import { useState, useEffect } from 'react';
 import { db } from '@/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 
+const MOCK_PROJECTS: Project[] = [
+  {
+    id: 'mock-1',
+    name: 'Metropolis 2077',
+    category: 'Architecture',
+    year: '2024',
+    description: 'A cinematic exploration of a futuristic city using layered parallax effects and scroll-triggered lighting.',
+    tags: ['Next.js', 'Framer Motion', '3D'],
+    images: {
+      thumb: 'https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?auto=format&fit=crop&q=80&w=2070',
+      hero: 'https://images.unsplash.com/photo-1545641203-7d072a14e3b2?auto=format&fit=crop&q=80&w=2072'
+    },
+    createdAt: new Date()
+  },
+  {
+    id: 'mock-2',
+    name: 'Oceanic Horizon',
+    category: 'Motion Graphics',
+    year: '2023',
+    description: 'Deep sea depth simulation with interactive scroll-triggered depth layers.',
+    tags: ['Motion', 'Simulation', 'Visuals'],
+    images: {
+      thumb: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&q=80&w=2070',
+      hero: 'https://images.unsplash.com/photo-1439405326854-014607f694d7?auto=format&fit=crop&q=80&w=2070'
+    },
+    createdAt: new Date()
+  }
+];
+
 export interface Project {
   id: string;
   name: string;
@@ -41,7 +70,7 @@ export function useProjects() {
       },
       (error) => {
         console.error('Error fetching projects:', error);
-        setProjects([]);
+        setProjects(MOCK_PROJECTS);
         setLoading(false);
       }
     );
