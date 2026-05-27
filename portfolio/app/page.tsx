@@ -36,6 +36,10 @@ export default function Home() {
         <Hero />
       </div>
 
+      {/* Spacer so users can immediately see the scroll-driven parallax */}
+      <div className="h-24" aria-hidden="true" />
+
+
       {/* PROJECTS */}
       <div className="relative">
         {loading ? (
