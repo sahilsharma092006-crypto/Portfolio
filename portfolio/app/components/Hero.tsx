@@ -1,152 +1,78 @@
-"use client";
+'use client';
 
-import React from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
+import Image from 'next/image';
 
 export default function Hero() {
-  const { scrollY } = useScroll();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
 
-  // Fake camera movement: background moves slower, front moves faster.
-  const bgY = useTransform(scrollY, [0, 900], [0, 180]);
-  const midY = useTransform(scrollY, [0, 900], [0, 300]);
-  const frontY = useTransform(scrollY, [0, 900], [0, 420]);
-
-  // Fake zoom (camera dolly-in)
-  const zoom = useTransform(scrollY, [0, 900], [1, 1.12]);
-
-  // Slight parallax X to feel like a camera move
-  const x = useTransform(scrollY, [0, 900], [0, -18]);
-  const fogY = useTransform(scrollY, [0, 900], [0, 120]);
-
-  // Depth blur: far layers blur more.
-
-  // (Optional) blur values if your Framer Motion types support transform -> filter.
-  // Kept simple here for compatibility.
-  // NOTE: keeping blur transforms optional (no-op in this version for TS compatibility)
-  // const bgBlur = useTransform(scrollY, [0, 900], [3, 0]);
-  // const midBlur = useTransform(scrollY, [0, 900], [2, 0]);
-  // const frontBlur = useTransform(scrollY, [0, 900], [0.5, 0]);
+  // Parallax offsets for the "Fake 3D" layers described in README_BLACKBOXAI.md
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const midY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const frontY = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
+  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "-40%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
-    <section
-      className="relative h-[140vh] overflow-hidden bg-black"
-      aria-label="Cinematic hero"
-    >
-      {/* Sticky viewport for the "movie frame" */}
-      <div className="sticky top-0 h-screen w-full">
-        {/* Perspective + transform container */}
+    <section ref={containerRef} className="relative h-[120vh] w-full overflow-hidden bg-black">
+      {/* Layer 1: Background (Farthest) */}
+      <motion.div style={{ y: bgY }} className="absolute inset-0 z-0">
+        <Image src="/hero/bg.png" alt="" fill className="object-cover opacity-60 scale-110" />
+      </motion.div>
+
+      {/* Layer 2: Midground / Fog */}
+      <motion.div style={{ y: midY }} className="absolute inset-0 z-10 pointer-events-none">
+        <Image src="/hero/mid.png" alt="" fill className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black" />
+      </motion.div>
+
+      {/* Content Layer (Floating) */}
+      <motion.div 
+        style={{ y: textY, opacity }}
+        className="relative z-20 flex h-screen flex-col items-center justify-center text-center px-6"
+      >
         <motion.div
-          className="absolute inset-0 [perspective:1000px] [transform-style:preserve-3d]"
-          style={{ scale: zoom, x }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, ease: "easeOut", delay: 0.5 }}
         >
-          {/* Gradient base */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(56,189,248,0.20),transparent_55%),radial-gradient(ellipse_at_top,rgba(59,130,246,0.18),transparent_45%)]" />
-
-          {/* Background layer (far) */}
-          <motion.img
-            src="/hero/bg.png"
-            alt="Background"
-            className="absolute left-0 top-0 h-full w-full object-cover"
-            style={{
-              y: bgY,
-              filter: `blur(3px) saturate(1.05)`,
-              opacity: 0.98,
-              transform: "translateZ(-120px) rotateX(8deg) scale(1.06)",
-            }}
-          />
-
-          {/* Mid layer */}
-          <motion.img
-            src="/hero/mid.png"
-            alt="Mid objects"
-            className="absolute left-0 top-0 h-full w-full object-cover"
-            style={{
-              y: midY,
-              filter: `blur(2px) saturate(1.05)`,
-              /* Note: exported PNGs are already depth-separated; this blur adds cinematic focus */
-              transform: "translateZ(-40px) rotateX(6deg) scale(1.04)",
-            }}
-          />
-
-          {/* Foreground layer (near) */}
-          <motion.img
-            src="/hero/front.png"
-            alt="Foreground"
-            className="absolute left-0 top-0 h-full w-full object-cover"
-            style={{
-              y: frontY,
-              filter: `blur(0.5px) saturate(1.1)`,
-              transform: "translateZ(70px) rotateX(4deg) scale(1.02)",
-            }}
-          />
-
-          {/* Fog / FX overlay */}
-          <motion.img
-            src="/hero/fog.png"
-            alt="Fog"
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-screen"
-            style={{
-              y: fogY,
-              filter: "blur(6px) contrast(1.05)",
-              transform: "translateZ(10px) scale(1.08)",
-            }}
-          />
-
-
-          {/* Light leaks */}
-          <div className="pointer-events-none absolute inset-0 opacity-50 [background:linear-gradient(90deg,rgba(59,130,246,0.25),transparent_45%),linear-gradient(180deg,rgba(16,185,129,0.12),transparent_60%),radial-gradient(circle_at_25%_30%,rgba(56,189,248,0.25),transparent_45%)]" />
-
-          {/* Vignette */}
-          <div className="pointer-events-none absolute inset-0 [background:radial-gradient(ellipse_at_center,transparent_55%,rgba(0,0,0,0.75)_100%)]" />
-
-          {/* Grain */}
-          <div className="pointer-events-none absolute inset-0 opacity-30 mix-blend-overlay">
-            <div
-              className="h-full w-full [background-image:url('/hero/grain.png')] [background-size:200px_200px]"
-            />
-          </div>
-        </motion.div>
-
-        {/* Cinematic UI */}
-        <div className="relative z-50 flex h-full flex-col items-center justify-center px-6 text-center">
-          <div className="absolute left-1/2 top-10 -translate-x-1/2 rounded-3xl border border-white/10 bg-white/5 px-4 py-2 text-xs tracking-[0.4em] text-white/70 backdrop-blur">
-            PORTFOLIO / CINEMATIC DEPTH
-
-          </div>
-
-          <h1 className="mt-10 text-7xl font-black tracking-tight text-white sm:text-[88px]">
-            SAHIL SHARMA
+          <h1 className="text-7xl md:text-[12rem] font-bold tracking-tighter text-white">
+            SAHIL
           </h1>
-          <p className="mt-6 max-w-2xl text-base text-white/70 sm:text-lg">
-            Software & Web Developer — BCA student building full-stack apps, automation tools,
-            and data-driven web experiences.
+          <p className="mt-4 text-xs md:text-sm font-light tracking-[0.8em] text-blue-400 uppercase">
+            Creative 3D Artist & Developer
           </p>
+        </motion.div>
+      </motion.div>
 
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="#projects"
-              className="rounded-full bg-blue-500/20 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(56,189,248,0.25)] ring-1 ring-blue-400/30 backdrop-blur transition hover:bg-blue-500/28"
-            >
-              View projects
+      {/* Layer 3: Foreground (Nearest) */}
+      <motion.div style={{ y: frontY }} className="absolute inset-0 z-30 pointer-events-none">
+        <Image src="/hero/front.png" alt="" fill className="object-cover scale-105" />
+      </motion.div>
 
-            </a>
-            <a
-              href="#contact"
-              className="rounded-full bg-white/5 px-6 py-3 text-sm font-semibold text-white ring-1 ring-white/10 backdrop-blur transition hover:bg-white/8"
-            >
-              Contact
+      {/* Cinematic Overlays */}
+      <div className="absolute inset-0 z-40 pointer-events-none mix-blend-overlay opacity-30">
+        <Image src="/hero/grain.png" alt="" fill className="object-cover animate-pulse" />
+      </div>
+      
+      <div className="absolute inset-0 z-50 pointer-events-none">
+        <div className="h-full w-full bg-[radial-gradient(circle_at_center,transparent_0%,black_100%)]" />
+      </div>
 
-            </a>
-          </div>
-
-          {/* Scroll hint */}
-          <div className="pointer-events-none mt-16 text-white/60">
-            <div className="mx-auto h-10 w-10 rounded-full border border-white/15 bg-white/5" />
-            <div className="mt-3 text-xs tracking-widest">SCROLL</div>
-          </div>
-        </div>
+      {/* Scroll Hint */}
+      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4">
+        <span className="text-[10px] uppercase tracking-widest text-white/40">Scroll to Explore</span>
+        <motion.div
+          animate={{ height: [0, 48, 0], y: [0, 0, 48] }}
+          transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+          className="w-px bg-blue-500"
+        />
       </div>
     </section>
   );
 }
-
