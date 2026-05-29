@@ -13,8 +13,8 @@ export default function Navbar() {
       </Link>
       
       <div className="flex gap-8 text-xs font-bold font-mono tracking-widest text-gray-400 uppercase">
-        <Link href="#projects" className="hover:text-white transition-colors">Projects</Link>
-        <Link href="#about" className="hover:text-white transition-colors">About</Link>
+        <Link href="/#projects" className="hover:text-white transition-colors">Projects</Link>
+        <Link href="/#about" className="hover:text-white transition-colors">About</Link>
         {user ? (
           <Link href="/admin" className="text-blue-400 hover:text-blue-300">Admin</Link>
         ) : (

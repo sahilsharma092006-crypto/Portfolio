@@ -5,6 +5,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 const Contact = () => {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState({ type: '', msg: '' });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -14,9 +15,10 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setStatus({ type: '', msg: '' });
 
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
-      alert("Please fill in all fields.");
+      setStatus({ type: 'error', msg: 'Please fill in all fields.' });
       setIsSubmitting(false);
       return;
     }
@@ -29,11 +31,11 @@ const Contact = () => {
         createdAt: serverTimestamp(),
       });
 
-      alert('Thank you! Your message has been sent.');
+      setStatus({ type: 'success', msg: 'Thank you! Your message has been sent.' });
       setForm({ name: '', email: '', message: '' });
     } catch (error) {
       console.error('Error sending message:', error);
-      alert('Failed to send message. Please check your Firebase rules.');
+      setStatus({ type: 'error', msg: 'Failed to send message. Please try again later.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -76,6 +78,12 @@ const Contact = () => {
         >
           {isSubmitting ? 'Sending...' : 'Send'}
         </button>
+
+        {status.msg && (
+          <p className={`text-sm font-medium ${status.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+            {status.msg}
+          </p>
+        )}
       </form>
     </section>
   );

@@ -1,0 +1,8 @@
+kind: "AppHostingYaml"
+schemaVersion: "v1"
+runConfig:
+  minInstances: 0
+  maxInstances: 10
+env:
+  - name: GEMINI_API_KEY
+    availability: ["RUNTIME"]

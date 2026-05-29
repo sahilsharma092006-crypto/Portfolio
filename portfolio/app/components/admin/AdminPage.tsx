@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { auth, storage, db } from "@/firebase";
+import { auth, db, storage } from "@/firebase";
+
 import {
   getDownloadURL,
   ref,
