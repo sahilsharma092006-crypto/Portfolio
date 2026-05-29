@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { db } from '@/firebase';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { staticProjects } from './data/projects';
 
 export interface Project {
   id: string;
@@ -23,18 +22,13 @@ export function useProjects() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const projectData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Project[];
-      setProjects(projectData);
+    // Simulate a brief loading state for the cinematic "Loading Cinematic Universe" effect
+    const timer = setTimeout(() => {
+      setProjects(staticProjects);
       setLoading(false);
-    });
+    }, 800);
 
-    return () => unsubscribe();
+    return () => clearTimeout(timer);
   }, []);
 
   return { projects, loading };
