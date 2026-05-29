@@ -2,15 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { auth, db, storage } from "@/firebase";
-
+import { auth, storage, db } from "@/firebase";
 import {
   getDownloadURL,
   ref,
   uploadBytes,
+  deleteObject
 } from "firebase/storage";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, deleteDoc, doc } from "firebase/firestore";
+import { useProjects } from "@/app/useProjects";
 
 
 
@@ -139,6 +140,24 @@ export default function AdminPage() {
     }
   };
 
+  const handleDelete = async (projectId: string, imageUrls: string[]) => {
+    if (!confirm("Are you sure you want to delete this project?")) return;
+    
+    try {
+      setStatus("Deleting project...");
+      // Delete from Firestore
+      await deleteDoc(doc(db, "projects", projectId));
+      
+      // Note: Full storage cleanup would require storing paths, 
+      // but deleting the metadata removes it from the site instantly.
+      
+      setStatus("Project deleted successfully ✅");
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Delete failed";
+      setStatus(message);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-black text-white pt-24 pb-16">
@@ -149,7 +168,7 @@ export default function AdminPage() {
           transition={{ duration: 0.6 }}
         >
           <h1 className="text-3xl font-bold">Admin Upload</h1>
-          <p className="mt-2 text-white/70 text-sm">
+          <p className="mt-1 text-white/70 text-sm">
             Upload project images/videos and save metadata (Firestore).
           </p>
 
@@ -171,6 +190,7 @@ export default function AdminPage() {
               </button>
             )}
 
+            {isAdmin && (
             <div className="mt-4 space-y-4">
               <label className="block">
                 <div className="text-xs uppercase tracking-wide text-white/60">Name</div>
@@ -259,9 +279,37 @@ export default function AdminPage() {
                 <div className="text-sm text-white/70">{status}</div>
               </div>
             </div>
+            )}
           </div>
         </motion.div>
+
+        {isAdmin && (
+          <div className="mt-12">
+            <h2 className="text-xl font-bold mb-6">Manage Projects</h2>
+            <div className="grid gap-4">
+              {projects.map((project) => (
+                <div 
+                  key={project.id} 
+                  className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4"
+                >
+                  <div className="flex items-center gap-4">
+                    <img src={project.images.thumb} className="h-12 w-12 rounded-lg object-cover" alt="" />
+                    <div>
+                      <div className="font-medium">{project.name}</div>
+                      <div className="text-xs text-white/50">{project.category} — {project.year}</div>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => handleDelete(project.id, [project.images.thumb || "", project.images.hero || ""])}
+                    className="text-xs font-bold text-red-400 hover:text-red-300 uppercase tracking-widest"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-}
