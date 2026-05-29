@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import getAdmin from "../../firebaseAdmin";
+import { adminAuth, adminFirestore } from "../../../firebaseAdmin";
+import { FieldValue } from "firebase-admin/firestore";
 
 // NOTE: This route expects Firebase Storage upload to be handled client-side,
 // and then we write the project metadata in Firestore.
@@ -12,18 +13,14 @@ async function requireAdmin(req: NextRequest) {
     throw new Error("Missing Authorization Bearer token");
   }
 
-  const admin = await getAdmin();
-  const auth = admin.auth();
-  const decoded = await auth.verifyIdToken(token);
-  const db = admin.firestore();
-
   // Check the 'admins' collection for a document matching the email.
   // This aligns with the firestore.rules for a single source of truth.
+  const decoded = await adminAuth.verifyIdToken(token);
   if (!decoded.email || !decoded.email_verified) {
     throw new Error("Forbidden: Verified email required");
   }
 
-  const adminDoc = await db.collection("admins").doc(decoded.email).get();
+  const adminDoc = await adminFirestore.collection("admins").doc(decoded.email).get();
   if (!adminDoc.exists) {
     throw new Error("Forbidden");
   }
@@ -36,28 +33,25 @@ export async function POST(req: NextRequest) {
     await requireAdmin(req);
 
     const body = await req.json();
-    const admin = await getAdmin();
-    const db = admin.firestore();
-
     // Expected body:
     // { name, category, year, description, tags?, images: { thumb, hero } }
     const { name, category, year, description, tags, images } = body || {};
 
-    if (!name || !category || !year || !description) {
+    if (!name || !category || !year || !description || !images?.thumb) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    const docRef = await db.collection("projects").add({
+    const docRef = await adminFirestore.collection("projects").add({
       name,
       category,
       year,
       description,
       tags: Array.isArray(tags) ? tags : [],
       images: images && typeof images === "object" ? images : {},
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
 
     return NextResponse.json({ ok: true, id: docRef.id });
@@ -66,4 +60,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: message }, { status: 401 });
   }
 }
-

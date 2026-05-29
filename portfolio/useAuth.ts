@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
-import { auth } from '@/firebase'; // Import the auth instance
+import { auth } from '@/firebase';
+
 
 /**
  * Custom hook to manage Firebase Authentication state.
