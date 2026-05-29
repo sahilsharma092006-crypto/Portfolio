@@ -8,6 +8,7 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
+import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 
@@ -48,6 +49,15 @@ export default function AdminPage() {
     return () => unsubscribe();
   }, []);
 
+  const handleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (e) {
+      setStatus("Login failed: " + (e as Error).message);
+    }
+  };
+
   const onPick = (key: "thumbFile" | "heroFile") =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const f = e.target.files?.[0] ?? null;
@@ -58,6 +68,11 @@ export default function AdminPage() {
     try {
       setUploading(true);
       setStatus("Uploading to Firebase Storage...");
+
+      if (!form.name || !form.thumbFile) {
+        setStatus("Name and Thumbnail are required.");
+        return;
+      }
 
       const user = auth.currentUser;
       if (!user) {
@@ -141,6 +156,19 @@ export default function AdminPage() {
             <div className="text-sm text-white/70">
               Signed in as: <span className="text-white/90">{userEmail ?? "—"}</span>
             </div>
+            
+            {!userEmail ? (
+              <button
+                onClick={handleLogin}
+                className="mt-4 rounded-lg bg-white px-4 py-2 text-sm font-bold text-black hover:bg-white/90"
+              >
+                Sign in with Google
+              </button>
+            ) : (
+              <button onClick={() => signOut(auth)} className="mt-2 text-xs text-red-400 underline">
+                Sign Out
+              </button>
+            )}
 
             <div className="mt-4 space-y-4">
               <label className="block">

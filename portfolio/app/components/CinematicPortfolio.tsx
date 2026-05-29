@@ -2,7 +2,7 @@
 
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
-import { useProjects, Project } from '../useProjects';
+import { useProjects, Project } from "../useProjects";
 import Image from 'next/image';
 
 // Note: keep this component dependency-free (no clsx/tailwind-merge) so Next.js builds
