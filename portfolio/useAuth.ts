@@ -8,6 +8,9 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { User } from 'firebase/auth';
 import { auth } from '@/firebase';
 
+<<<<<<< HEAD
+>>>>>>> 95a7616fab6c8b98d972030617beb18090d80590
+=======
 >>>>>>> 95a7616fab6c8b98d972030617beb18090d80590
 
 export function useAuth() {

@@ -97,6 +97,9 @@ export default function Home() {
             </div>
           </div>
           <Contact />
+<<<<<<< HEAD
+>>>>>>> 95a7616fab6c8b98d972030617beb18090d80590
+=======
 >>>>>>> 95a7616fab6c8b98d972030617beb18090d80590
         </div>
       </section>
