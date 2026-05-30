@@ -12,8 +12,9 @@ export default function TopNav() {
   const items: NavItem[] = useMemo(
     () => [
       { label: "Home", href: "#home" },
+      { label: "Cinematic", href: "#cinematic-projects" },
       { label: "Projects", href: "#projects" },
-      { label: "Skills", href: "#skills" },
+      { label: "About", href: "#about" },
       { label: "Contact", href: "#contact" },
       { label: "Admin", href: "/admin" },
     ],
@@ -146,4 +147,3 @@ export default function TopNav() {
     </header>
   );
 }
-

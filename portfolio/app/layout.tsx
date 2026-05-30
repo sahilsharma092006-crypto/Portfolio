@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Poppins, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/Navbar";
+import SmoothScroll from "./components/SmoothScroll";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -36,8 +37,10 @@ export default function RootLayout({
       className={`${inter.variable} ${poppins.variable} ${mono.variable} h-full antialiased selection:bg-blue-500 selection:text-white scroll-smooth`}
     >
       <body className="min-h-full flex flex-col overflow-x-hidden bg-black text-white font-inter">
-        <Navbar />
-        {children}
+        <SmoothScroll>
+          <Navbar />
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );

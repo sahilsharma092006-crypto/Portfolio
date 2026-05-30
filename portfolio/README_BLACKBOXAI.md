@@ -4,6 +4,7 @@
 - Layered “fake 3D” hero using absolutely-positioned PNG layers
 - Scroll-based camera feel: background/mid/front move at different speeds + subtle zoom
 - Cinematic UI overlays: vignette, light leaks, and grain overlay
+- Kinetic Typography: Jitter-style staggered text reveals with blur and 3D rotation
 
 ## Assets
 Put these files in:
@@ -23,4 +24,3 @@ Then open: http://localhost:3000
 
 ## Notes
 This demo uses lightweight layered PNG parallax (not real Three.js) for smooth performance.
-

@@ -9,8 +9,11 @@ This is a personal portfolio website designed to showcase my projects and skills
 - **Styling:** Tailwind CSS / 3D Components
 
 ## Getting Started
-1. Install dependencies: `npm install`
-2. Set environment variable: `export GEMINI_API_KEY=your_key`
+1. Install dependencies: `npm install framer-motion`
+2. Create a `.env.local` file in the `portfolio` directory and add your Gemini API key:
+   ```
+   GEMINI_API_KEY=your_key_here
+   ```
 3. Start Genkit UI: `npm run genkit:ui`
 4. Local development: `npm run dev`
 5. Deploy: `firebase deploy`
