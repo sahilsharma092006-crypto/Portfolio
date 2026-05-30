@@ -4,6 +4,7 @@ import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Project } from "./ProjectModal";
 import Image from "next/image";
+import { AnimatedText } from "./ui/AnimatedText";
 
 export default function ProjectsGrid({
   projects,
@@ -26,9 +27,14 @@ export default function ProjectsGrid({
   return (
     <section id="projects" className="mt-20">
       <div className="mb-8">
-        <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs tracking-[0.4em] text-white/70 backdrop-blur">
-          PROJECTS / SELECTED
-        </div>
+        <motion.div 
+          className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs tracking-[0.4em] text-white/70 backdrop-blur"
+        >
+          <AnimatedText 
+            text="PROJECTS / SELECTED" 
+            type="word" 
+          />
+        </motion.div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -112,4 +118,3 @@ export default function ProjectsGrid({
     </section>
   );
 }
-

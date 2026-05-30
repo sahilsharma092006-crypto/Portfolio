@@ -10,6 +10,8 @@ import ProjectModal, { Project } from './components/ProjectModal';
 import { AnimatedText } from './components/ui/AnimatedText';
 import Contact from '../Contact';
 import CinematicPortfolio from './components/CinematicPortfolio';
+import LaptopShowcase from './components/LaptopShowcase';
+import EditorialGrid from './components/EditorialGrid';
 
 export default function Home() {
   const { projects, loading } = useProjects();
@@ -36,12 +38,18 @@ export default function Home() {
       </section>
 
       {/* CINEMATIC PROJECTS (Full Screen 3D scroll) */}
-      <section id="cinematic-projects">
+      <section id="cinematic-projects" className="scroll-mt-24">
         <CinematicPortfolio />
       </section>
 
+      {/* 3D SHOWCASE */}
+      <LaptopShowcase />
+
+      {/* EDITORIAL REVEAL */}
+      <EditorialGrid />
+
       {/* ALL PROJECTS GRID */}
-      <section id="projects" className="relative py-24 bg-zinc-950">
+      <section id="projects" className="relative py-24 bg-zinc-950 scroll-mt-24">
         <div className="max-w-7xl mx-auto px-6">
           <div className="mb-16 text-center">
             <AnimatedText 
@@ -65,7 +73,7 @@ export default function Home() {
       </AnimatePresence>
 
       {/* ABOUT & SKILLS */}
-      <section id="about" className="relative z-10 bg-black min-h-screen flex items-center">
+      <section id="about" className="relative z-10 bg-black min-h-screen flex items-center scroll-mt-24">
         <div className="max-w-7xl mx-auto px-6 py-24 w-full">
           <div className="max-w-4xl mb-24">
             <AnimatedText 
@@ -129,7 +137,7 @@ export default function Home() {
       </section>
 
       {/* CONTACT */}
-      <section id="contact" className="relative bg-zinc-950">
+      <section id="contact" className="relative bg-zinc-950 scroll-mt-24">
         <div className="max-w-7xl mx-auto px-6 py-32">
           <div className="mb-12 text-center">
             <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs tracking-[0.4em] text-white/70 backdrop-blur">
